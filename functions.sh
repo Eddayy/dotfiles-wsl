@@ -111,26 +111,32 @@ function impl_git() {
 }
 
 
-function impl_python() {
-    ln2home pythonrc.py
+function impl_flutter() {
+    FLUTTER_FILE="flutter_linux_1.17.4-stable.tar.xz"
+    FLUTTER_DIRECTORY="$HOME/flutter"
+    [ ! -d "${FLUTTER_DIRECTORY}" ] && mkdir -p "${FLUTTER_DIRECTORY}"
+    curl -o "/tmp/${FLUTTER_FILE}" "https://storage.googleapis.com/flutter_infra/releases/stable/linux/${FLUTTER_FILE}"
+    cd "$(dirname "${FLUTTER_DIRECTORY}")" || exit "Could not enter base directory to install Flutter."
+    tar xf "/tmp/${FLUTTER_FILE}" -C "${HOME}/"
+    cd "${FLUTTER_DIRECTORY}" || exit "Could not enter Flutter directory."
+    [ ! -f "${FLUTTER_DIRECTORY}/bin/flutter" ] && exit "Could not find Flutter binary."
+    "${FLUTTER_DIRECTORY}/bin/flutter" doctor -v
 }
 
-
-function impl_moc() {
-    install_if_not_exist moc
-    ln2home moc
+function impl_android() {
+    ANDROID_FILE="sdk-tools-linux-4333796.zip"
+    sudo apt-get install unzip zip
+    curl -o "/tmp/${ANDROID_FILE}" "https://dl.google.com/android/repository/${ANDROID_FILE}"
+    unzip "/tmp/${ANDROID_FILE}" -d ~/Android
+    rm sdk-tools-linux-4333796.zip
+    sudo apt-get install -y lib32z1 openjdk-8-jdk
+    ~/Android/tools/bin/sdkmanager --install "platform-tools" "platforms;android-28" "build-tools;28.0.3"
+    sdkmanager --update
+    curl -s "https://get.sdkman.io" | bash
+    source "$HOME/.sdkman/bin/sdkman-init.sh"
+    sdk install gradle 5.5.1
+    gradle -v
 }
-
-
-function impl_wget() {
-    install_if_not_exist wget
-    ln2home wgetrc
-}
-
-function impl_tmux {
-    ln2home tmux.conf
-}
-
 
 function conf_zsh() {
     local user="$(whoami)"
